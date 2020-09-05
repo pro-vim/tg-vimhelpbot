@@ -94,22 +94,19 @@ async fn run() -> i32 {
         let neovim_db = neovim_db.clone();
         async move {
             if let Some(text) = message.update.text() {
-                let links: Vec<_> = HELP_REGEX
-                    .captures_iter(text)
-                    .filter_map(|capture| {
-                        let topic = &capture[1];
-                        if let Some(entry) = vim_db.find(topic) {
-                            Some((entry, Vim))
-                        } else if let Some(entry) = neovim_db.find(topic) {
-                            Some((entry, NeoVim))
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                if !links.is_empty() {
+                let answer = format_message(HELP_REGEX.captures_iter(text).filter_map(|capture| {
+                    let topic = &capture[1];
+                    if let Some(entry) = vim_db.find(topic) {
+                        Some((entry, Vim))
+                    } else if let Some(entry) = neovim_db.find(topic) {
+                        Some((entry, NeoVim))
+                    } else {
+                        None
+                    }
+                }));
+                if !answer.is_empty() {
                     message
-                        .answer(format_message(links))
+                        .answer(answer)
                         .parse_mode(ParseMode::HTML)
                         .send()
                         .await?;
