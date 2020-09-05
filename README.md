@@ -13,3 +13,5 @@ If message consists only of one or several help requests, bot will try to delete
 
 ## License
 This code is available under either MIT or Apache 2.0 license, at your choice.
+
+`vimtags` and `nvimtags` files are available under Vim license.
