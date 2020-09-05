@@ -1,0 +1,16 @@
+[package]
+name = "vimhelp"
+version = "0.1.0"
+authors = ["Maximilian Siling <mouse-art@ya.ru>"]
+edition = "2018"
+
+[dependencies]
+teloxide = "0.3.0"
+tokio = { version = "0.2.22", features = ["rt-threaded", "macros"] }
+log = "0.4.11"
+pretty_env_logger = "0.4.0"
+dotenv = "0.15.0"
+regex = "1.3.9"
+once_cell = "1.4.0"
+percent-encoding = "2.1.0"
+itertools = "0.9.0"
