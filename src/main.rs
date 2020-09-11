@@ -110,7 +110,7 @@ async fn run() -> i32 {
                         .parse_mode(ParseMode::HTML)
                         .send()
                         .await?;
-                    if DELETE_REGEX.is_match(text) {
+                    if DELETE_REGEX.is_match(text) && message.update.reply_to_message().is_none() {
                         message
                             .delete_message()
                             .send()
