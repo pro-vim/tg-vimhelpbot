@@ -1,5 +1,6 @@
 use std::{
     collections::HashMap,
+    env,
     fs::File,
     io::{self, BufRead, BufReader},
     path::Path,
@@ -81,5 +82,11 @@ impl TagsDb {
         } else {
             None
         }
+    }
+
+    pub fn from_env(env_var: &str) -> Option<Self> {
+        env::var(env_var)
+            .ok()
+            .and_then(|path| Self::read_file(path).ok())
     }
 }
