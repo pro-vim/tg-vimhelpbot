@@ -37,7 +37,7 @@ async fn run() -> i32 {
     teloxide::repl(bot, move |message| {
         let tagsearch = tagsearch.clone();
         async move {
-            handle_message(message, tagsearch.clone()).await;
+            handle_message(message, tagsearch).await;
             ResponseResult::<()>::Ok(())
         }
     })
