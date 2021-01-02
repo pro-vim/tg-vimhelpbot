@@ -2,7 +2,6 @@ mod tagsdb;
 mod tagsearch;
 mod utils;
 
-use std::env;
 use tagsearch::TagSearcher;
 use teloxide::{dispatching::Dispatcher, prelude::*, types::ParseMode};
 use utils::DELETE_REGEX;
@@ -34,11 +33,9 @@ async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher
 }
 
 #[tokio::main]
-async fn main() {
-    dotenv::dotenv().ok();
-    teloxide::enable_logging!();
-
-    let tagsearch = TagSearcher::from_env();
+async fn main() -> anyhow::Result<()> {
+    let tagsearch = TagSearcher::from_env()
+        .map_err(|flavor| anyhow::anyhow!("Failed to load {:?} database", flavor))?;
     let bot = Bot::from_env();
     log::info!("Starting vim-help bot...");
 
@@ -51,4 +48,6 @@ async fn main() {
         })
         .dispatch()
         .await;
+
+    Ok(())
 }

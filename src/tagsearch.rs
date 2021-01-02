@@ -14,14 +14,10 @@ pub enum Flavor {
 }
 
 impl TagSearcher {
-    pub fn from_env() -> Self {
-        let vim_db = TagsDb::from_env("VIM_DB_PATH")
-            .map(Arc::new)
-            .expect("Failed to parse Vim db");
-        let neovim_db = TagsDb::from_env("NEOVIM_DB_PATH")
-            .map(Arc::new)
-            .expect("Failed to parse Neovim db");
-        Self { vim_db, neovim_db }
+    pub fn from_env() -> Result<Self, Flavor> {
+        let vim_db = TagsDb::from_env("VIM_DB_PATH").map(Arc::new).ok_or(Flavor::Vim)?;
+        let neovim_db = TagsDb::from_env("NEOVIM_DB_PATH").map(Arc::new).ok_or(Flavor::NeoVim)?;
+        Ok(Self { vim_db, neovim_db })
     }
 
     pub fn find_by_text(&self, text: &str) -> Option<String> {
