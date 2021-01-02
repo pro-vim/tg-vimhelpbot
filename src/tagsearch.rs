@@ -2,7 +2,7 @@ use crate::{tagsdb::TagsDb, utils::*};
 use std::sync::Arc;
 
 #[derive(Clone)]
-pub struct TagSearch {
+pub struct TagSearcher {
     vim_db: Arc<TagsDb>,
     neovim_db: Arc<TagsDb>,
 }
@@ -13,7 +13,7 @@ pub enum Flavor {
     NeoVim,
 }
 
-impl TagSearch {
+impl TagSearcher {
     pub fn from_env() -> Self {
         let vim_db = TagsDb::from_env("VIM_DB_PATH")
             .map(Arc::new)

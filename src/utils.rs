@@ -15,7 +15,6 @@ macro_rules! help_regex_s {
 pub static HELP_REGEX: Lazy<Regex> =
     Lazy::new(|| Regex::new(help_regex_s!()).expect("failed to compile regex"));
 
-#[allow(dead_code)]
 pub static DELETE_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(concat!(r"^[\s\n]*(?:", help_regex_s!(), r"[\s\n]*)+$"))
         .expect("failed to compile regex")
