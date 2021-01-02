@@ -13,7 +13,7 @@ async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher
         .map(|text| tagsearcher.find_by_text(text))
         .flatten()
         .map(|answer| message.answer(answer).parse_mode(ParseMode::HTML));
-    let must_delete = text
+    let should_delete = text
         .map(|text| DELETE_REGEX.is_match(text))
         .unwrap_or(false);
 
@@ -27,7 +27,7 @@ async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher
                 .await
                 .is_ok()
         };
-        if replied && must_delete {
+        if replied && should_delete {
             message.delete_message().send().await.ok();
         }
     }
