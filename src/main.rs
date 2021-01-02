@@ -7,10 +7,7 @@ use tagsearch::TagSearcher;
 use teloxide::{dispatching::Dispatcher, prelude::*, types::ParseMode};
 use utils::DELETE_REGEX;
 
-async fn handle_message(
-    message: UpdateWithCx<Message>,
-    tagsearcher: TagSearcher,
-) {
+async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher) {
     let text = message.update.text();
     let bot_reply = text
         .map(|text| tagsearcher.find_by_text(text))
@@ -48,10 +45,8 @@ async fn main() {
     Dispatcher::new(bot)
         .messages_handler({
             |rx: DispatcherHandlerRx<Message>| async move {
-                rx.for_each(move |message| {
-                    handle_message(message, tagsearch.clone())
-                })
-                .await
+                rx.for_each(|message| handle_message(message, tagsearch.clone()))
+                    .await
             }
         })
         .dispatch()
