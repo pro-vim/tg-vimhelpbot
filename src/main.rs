@@ -36,6 +36,9 @@ async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    dotenv::dotenv().ok();
+    teloxide::enable_logging!();
+
     let tagsearch = TagSearcher::from_env()
         .map_err(|flavor| anyhow::anyhow!("Failed to load {:?} database", flavor))?;
     let bot = Bot::from_env();
