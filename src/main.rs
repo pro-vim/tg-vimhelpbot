@@ -18,14 +18,16 @@ async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher
 
     if let Some(bot_reply) = bot_reply {
         let replied = if let Some(reply) = message.update.reply_to_message() {
-            bot_reply.reply_to_message_id(reply.id).send().await.is_ok()
-        } else {
+            bot_reply.reply_to_message_id(reply.id)
+        } else if should_delete {
             bot_reply
-                .reply_to_message_id(message.update.id)
-                .send()
-                .await
-                .is_ok()
-        };
+        } else {
+            bot_reply.reply_to_message_id(message.update.id)
+        }
+        .send()
+        .await
+        .is_ok();
+
         if replied && should_delete {
             message.delete_message().send().await.ok();
         }
