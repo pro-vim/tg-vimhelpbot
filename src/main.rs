@@ -3,7 +3,7 @@ mod tagsearch;
 mod utils;
 
 use tagsearch::TagSearcher;
-use teloxide::{dispatching::Dispatcher, prelude::*, types::ParseMode};
+use teloxide::{prelude::*, types::ParseMode};
 use utils::DELETE_REGEX;
 
 async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher) {
@@ -44,15 +44,13 @@ async fn main() -> anyhow::Result<()> {
     let bot = Bot::from_env();
     log::info!("Starting vim-help bot...");
 
-    Dispatcher::new(bot)
-        .messages_handler({
-            |rx: DispatcherHandlerRx<Message>| async move {
-                rx.for_each(|message| handle_message(message, tagsearch.clone()))
-                    .await
-            }
-        })
-        .dispatch()
-        .await;
-
+    teloxide::repl(bot, move |message| {
+        let tagsearcher = tagsearch.clone();
+        async move {
+            handle_message(message, tagsearcher).await;
+            ResponseResult::Ok(())
+        }
+    })
+    .await;
     Ok(())
 }
