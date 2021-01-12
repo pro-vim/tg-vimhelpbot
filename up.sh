@@ -2,3 +2,4 @@
 set -eu
 
 git pull
+echo test > /tmp/test
