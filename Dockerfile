@@ -1,4 +1,4 @@
-FROM rust:1.45 as build
+FROM rust:1.49 as build
 WORKDIR /app
 ADD Cargo.toml Cargo.toml /app/
 ADD src /app/src/
