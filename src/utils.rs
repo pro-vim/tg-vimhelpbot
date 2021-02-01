@@ -1,6 +1,5 @@
 use itertools::Itertools;
 use once_cell::sync::Lazy;
-use percent_encoding::{percent_encode, NON_ALPHANUMERIC};
 use regex::Regex;
 use teloxide::utils::html;
 
@@ -20,40 +19,15 @@ pub static DELETE_REGEX: Lazy<Regex> = Lazy::new(|| {
         .expect("failed to compile regex")
 });
 
-static VIM_URL_BASE: &str = "https://vimhelp.org";
-static NEOVIM_URL_BASE: &str = "https://neovim.io/doc/user";
-
-fn format_vim_url(entry: &Entry) -> String {
-    format!(
-        "{}/{}.txt.html#{}",
-        VIM_URL_BASE,
-        entry.filename,
-        percent_encode(entry.topic.as_bytes(), NON_ALPHANUMERIC)
-    )
-}
-
-fn format_neovim_url(entry: &Entry) -> String {
-    format!(
-        "{}/{}.html#{}",
-        NEOVIM_URL_BASE,
-        entry.filename,
-        percent_encode(entry.topic.as_bytes(), NON_ALPHANUMERIC)
-    )
-}
-
 pub fn format_message(links: impl IntoIterator<Item = (Entry, Flavor)>) -> String {
     links
         .into_iter()
         .map(|(entry, flavor)| {
-            let url = match flavor {
-                Flavor::Vim => format_vim_url(&entry),
-                Flavor::NeoVim => format_neovim_url(&entry),
-            };
             format!(
-                "Found help for {} in {:?} docs:\n{}",
+                "Found help for {} in {} docs:\n{}",
                 html::code_inline(&entry.topic),
                 flavor,
-                url
+                flavor.format_url(&entry),
             )
         })
         .join("\n\n")

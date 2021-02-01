@@ -18,6 +18,12 @@ pub struct TagsDb {
     entries: HashMap<String, Vec<Entry>>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Txt {
+    Trim,
+    Keep,
+}
+
 fn trim_topic(topic: &str) -> &str {
     topic.trim_matches(|c: char| !c.is_alphanumeric())
 }
@@ -44,7 +50,7 @@ fn best_match(opts: &[Entry]) -> Option<Entry> {
 }
 
 impl TagsDb {
-    pub fn read_file(path: impl AsRef<Path>) -> io::Result<Self> {
+    pub fn read_file(path: impl AsRef<Path>, trim_txt: Txt) -> io::Result<Self> {
         let mut entries: HashMap<_, Vec<_>> = HashMap::new();
         let f = BufReader::new(File::open(path)?);
         for line in f.lines() {
@@ -55,7 +61,11 @@ impl TagsDb {
                 continue;
             }
             let topic = parts[0];
-            let filename = parts[1].trim_end_matches(".txt");
+            let filename = if trim_txt == Txt::Trim {
+                parts[1].trim_end_matches(".txt")
+            } else {
+                parts[1]
+            };
             add_entry(&mut entries, topic, topic, filename, 0);
             add_entry(&mut entries, trim_topic(topic), topic, filename, 1);
             let topic_lc = parts[0].to_ascii_lowercase();
@@ -84,9 +94,9 @@ impl TagsDb {
         }
     }
 
-    pub fn from_env(env_var: &str) -> Option<Self> {
+    pub fn from_env(env_var: &str, trim_txt: Txt) -> Option<Self> {
         env::var(env_var)
             .ok()
-            .and_then(|path| Self::read_file(path).ok())
+            .and_then(|path| Self::read_file(path, trim_txt).ok())
     }
 }
