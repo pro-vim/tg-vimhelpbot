@@ -27,7 +27,9 @@ FROM base-debian
 COPY --from=build /app/target/release/vimhelp /usr/bin/vimhelpbot
 COPY --from=build-vim-tags /vim/runtime/doc/tags /usr/share/vimtags
 COPY --from=build-nvim-tags /neovim/build/runtime/doc/tags /usr/share/nvimtags
+COPY customtags /usr/share/customtags
 ENV VIM_DB_PATH=/usr/share/vimtags
 ENV NEOVIM_DB_PATH=/usr/share/nvimtags
+ENV CUSTOM_DB_PATH=/usr/share/customtags
 RUN rm -rf /var/lib/apt/lists/*
 CMD ["/usr/bin/vimhelpbot"]
