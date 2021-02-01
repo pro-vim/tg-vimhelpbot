@@ -17,15 +17,13 @@ RUN git checkout "$(cat /nvim-hash)"
 RUN make helptags
 
 FROM base-debian AS build-vim-tags
-RUN apt-get install -y git
+RUN apt-get install -y curl
 ADD vim-hash /
-RUN git clone https://github.com/vim/vim /vim
-WORKDIR /vim
-RUN git checkout "$(cat /vim-hash)"
+RUN curl -fSsLo /vimtags "https://raw.githubusercontent.com/vim/vim/$(cat /vim-hash)/runtime/doc/tags"
 
 FROM base-debian
 COPY --from=build /app/target/release/vimhelp /usr/bin/vimhelpbot
-COPY --from=build-vim-tags /vim/runtime/doc/tags /usr/share/vimtags
+COPY --from=build-vim-tags /vimtags /usr/share/vimtags
 COPY --from=build-nvim-tags /neovim/build/runtime/doc/tags /usr/share/nvimtags
 COPY customtags /usr/share/customtags
 ENV VIM_DB_PATH=/usr/share/vimtags
