@@ -79,25 +79,31 @@ impl TagSearcher {
         })
     }
 
-    pub fn find_by_text(&self, text: &str) -> Option<String> {
-        let help_texts: Vec<_> = HELP_REGEX
-            .captures_iter(text)
-            .map(|cap| {
-                let topic = &cap[1];
-                if let Some(entry) = self.vim_db.find(topic) {
-                    Some((entry, Flavor::Vim))
-                } else if let Some(entry) = self.neovim_db.find(topic) {
-                    Some((entry, Flavor::NeoVim))
-                } else if let Some(entry) = self.custom_db.as_ref().and_then(|db| db.find(topic)) {
-                    Some((entry, Flavor::Custom))
-                } else {
-                    None
-                }
-            })
-            .map(format_message)
-            .filter(|s| !s.is_empty())
-            .collect();
+    pub fn search_by_topic(&self, topic: &str) -> impl Iterator<Item = (Entry, Flavor)> {
+        use std::{convert::identity, iter::once};
 
-        Some(help_texts.join("\n\n")).filter(|s| !s.is_empty())
+        once(self.vim_db.find(topic).map(|entry| (entry, Flavor::Vim)))
+            .chain(once(
+                self.neovim_db
+                    .find(topic)
+                    .map(|entry| (entry, Flavor::NeoVim)),
+            ))
+            .chain(once(self.custom_db.as_ref().and_then(|db| {
+                db.find(topic).map(|entry| (entry, Flavor::Custom))
+            })))
+            .filter_map(identity)
+    }
+
+    fn find_entries_by_text<'a>(
+        &'a self,
+        text: &'a str,
+    ) -> impl Iterator<Item = (Entry, Flavor)> + 'a {
+        HELP_REGEX
+            .captures_iter(text)
+            .filter_map(move |cap| self.search_by_topic(&cap[1]).next())
+    }
+
+    pub fn find_by_text(&self, text: &str) -> Option<String> {
+        Some(format_message(self.find_entries_by_text(text))).filter(|s| !s.is_empty())
     }
 }
