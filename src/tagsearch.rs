@@ -80,8 +80,8 @@ impl TagSearcher {
     }
 
     pub fn find_by_text(&self, text: &str) -> Option<String> {
-        HELP_REGEX
-            .captures(text)
+        let help_texts: Vec<_> = HELP_REGEX
+            .captures_iter(text)
             .map(|cap| {
                 let topic = &cap[1];
                 if let Some(entry) = self.vim_db.find(topic) {
@@ -95,6 +95,9 @@ impl TagSearcher {
                 }
             })
             .map(format_message)
-            .and_then(|ans| if ans.is_empty() { None } else { Some(ans) })
+            .filter(|s| !s.is_empty())
+            .collect();
+
+        Some(help_texts.join("\n\n")).filter(|s| !s.is_empty())
     }
 }
