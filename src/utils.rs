@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use teloxide::utils::html;
+use teloxide::{types::User, utils::html};
 
 use crate::{tagsdb::Entry, tagsearch::Flavor};
 
@@ -19,12 +19,24 @@ pub static DELETE_REGEX: Lazy<Regex> = Lazy::new(|| {
         .expect("failed to compile regex")
 });
 
-pub fn format_message(links: impl IntoIterator<Item = (Entry, Flavor)>) -> String {
+pub fn format_message(
+    links: impl IntoIterator<Item = (Entry, Flavor)>,
+    user: Option<&User>,
+) -> String {
     links
         .into_iter()
-        .map(|(entry, flavor)| {
+        .enumerate()
+        .map(|(index, (entry, flavor))| {
+            let prefix = match index {
+                0 => match user {
+                    Some(user) => format!("{} found help", html::user_mention_or_link(user)),
+                    None => "Found help".to_string(),
+                },
+                _ => "... and".to_string(),
+            };
             format!(
-                "Found help for {} in {} docs:\n{}",
+                "{} for {} in {} docs:\n{}",
+                prefix,
                 html::code_inline(&entry.topic),
                 flavor,
                 flavor.format_url(&entry),

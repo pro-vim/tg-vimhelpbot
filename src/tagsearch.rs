@@ -21,12 +21,13 @@ pub enum Flavor {
 }
 
 impl fmt::Display for Flavor {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Flavor::Vim => f.write_str("Vim"),
-            Flavor::NeoVim => f.write_str("NeoVim"),
-            Flavor::Custom => f.write_str("custom"),
-        }
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let tag = match self {
+            Flavor::Vim => "Vim",
+            Flavor::NeoVim => "NeoVim",
+            Flavor::Custom => "custom",
+        };
+        f.write_str(tag)
     }
 }
 
@@ -94,16 +95,12 @@ impl TagSearcher {
             .filter_map(identity)
     }
 
-    fn find_entries_by_text<'a>(
+    pub fn find_entries_by_text<'a>(
         &'a self,
         text: &'a str,
     ) -> impl Iterator<Item = (Entry, Flavor)> + 'a {
         HELP_REGEX
             .captures_iter(text)
             .filter_map(move |cap| self.search_by_topic(&cap[1]).next())
-    }
-
-    pub fn find_by_text(&self, text: &str) -> Option<String> {
-        Some(format_message(self.find_entries_by_text(text))).filter(|s| !s.is_empty())
     }
 }
