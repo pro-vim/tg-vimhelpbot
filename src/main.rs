@@ -72,7 +72,7 @@ async fn handle_inline_query(query: UpdateWithCx<InlineQuery>, tagsearcher: TagS
         .send()
         .await
     {
-        log::error!("failed to answer inline query: {}", err)
+        log::error!("failed to answer inline query: {}", err);
     }
 }
 
