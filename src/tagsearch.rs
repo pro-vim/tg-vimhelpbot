@@ -25,7 +25,7 @@ impl fmt::Display for Flavor {
         let tag = match self {
             Flavor::Vim => "Vim",
             Flavor::NeoVim => "NeoVim",
-            Flavor::Custom => "custom",
+            Flavor::Custom => "Custom",
         };
         f.write_str(tag)
     }
