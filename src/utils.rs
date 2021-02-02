@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use teloxide::utils::html;
+use teloxide::{types::User, utils::html};
 
 use crate::{tagsdb::Entry, tagsearch::Flavor};
 
@@ -19,25 +19,32 @@ pub static DELETE_REGEX: Lazy<Regex> = Lazy::new(|| {
         .expect("failed to compile regex")
 });
 
-pub fn format_message(links: impl IntoIterator<Item = (Entry, Flavor)>) -> String {
-    links
+pub fn format_message(
+    links: impl IntoIterator<Item = (Entry, Flavor)>,
+    user: Option<&User>,
+) -> String {
+    let mut text = links
         .into_iter()
         .map(|(entry, flavor)| {
             format!(
-                "Found help for {} in {} docs:\n{}",
-                html::code_inline(&entry.topic),
+                "{} docs for {}:\n{}",
                 flavor,
+                html::code_inline(&entry.topic),
                 flavor.format_url(&entry),
             )
         })
-        .join("\n\n")
+        .join("\n\n");
+    if let Some(user) = user {
+        text += format!("\n\n[summoned by {}]", html::user_mention_or_link(user)).as_str();
+    }
+    text
 }
 
 pub fn format_inline_answer(entry: Entry, flavor: Flavor) -> String {
     format!(
-        "Help for {} in {} docs:\n{}",
-        html::code_inline(&entry.topic),
+        "{} docs for {}:\n{}",
         flavor,
+        html::code_inline(&entry.topic),
         flavor.format_url(&entry)
     )
 }

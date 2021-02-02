@@ -10,19 +10,24 @@ use teloxide::{
         InputMessageContentText, ParseMode,
     },
 };
-use utils::{format_inline_answer, DELETE_REGEX};
+use utils::{format_inline_answer, format_message, DELETE_REGEX};
 
 async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher) {
     let text = message.update.text();
-    let bot_reply = text
-        .map(|text| tagsearcher.find_by_text(text))
-        .flatten()
-        .map(|answer| message.answer(answer).parse_mode(ParseMode::HTML));
     let should_delete = text
         .map(|text| DELETE_REGEX.is_match(text))
         .unwrap_or(false);
 
-    if let Some(bot_reply) = bot_reply {
+    let from = if should_delete {
+        message.update.from()
+    } else {
+        None
+    };
+
+    if let Some(text) = text {
+        let reply_text = format_message(tagsearcher.search_by_text(text), from);
+        let bot_reply = message.answer(reply_text).parse_mode(ParseMode::HTML);
+
         let replied = if let Some(reply) = message.update.reply_to_message() {
             bot_reply.reply_to_message_id(reply.id)
         } else if should_delete {
@@ -65,7 +70,7 @@ async fn handle_inline_query(query: UpdateWithCx<InlineQuery>, tagsearcher: TagS
         .send()
         .await
     {
-        log::error!("failed to answer inline query: {}", err)
+        log::error!("failed to answer inline query: {}", err);
     }
 }
 
