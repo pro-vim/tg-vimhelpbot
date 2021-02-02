@@ -1,6 +1,6 @@
-FROM rust:1.49 as build
+FROM rust:1.49 AS build
 WORKDIR /app
-ADD Cargo.toml Cargo.toml /app/
+ADD Cargo.toml Cargo.lock /app/
 ADD src /app/src/
 RUN cargo build --release
 
