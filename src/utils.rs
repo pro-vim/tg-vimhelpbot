@@ -42,9 +42,9 @@ pub fn format_message(
 
 pub fn format_inline_answer(entry: Entry, flavor: Flavor) -> String {
     format!(
-        "Help for {} in {} docs:\n{}",
-        html::code_inline(&entry.topic),
+        "{} docs for {}:\n{}",
         flavor,
+        html::code_inline(&entry.topic),
         flavor.format_url(&entry)
     )
 }
