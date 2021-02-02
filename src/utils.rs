@@ -32,3 +32,12 @@ pub fn format_message(links: impl IntoIterator<Item = (Entry, Flavor)>) -> Strin
         })
         .join("\n\n")
 }
+
+pub fn format_inline_answer(entry: Entry, flavor: Flavor) -> String {
+    format!(
+        "Help for {} in {} docs:\n{}",
+        html::code_inline(&entry.topic),
+        flavor,
+        flavor.format_url(&entry)
+    )
+}
