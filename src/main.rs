@@ -24,12 +24,10 @@ async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher
         None
     };
 
-    let bot_reply = text
-        .map(|text| tagsearcher.find_entries_by_text(text))
-        .map(|results| format_message(results, from))
-        .map(|answer| message.answer(answer).parse_mode(ParseMode::HTML));
+    if let Some(text) = text {
+        let reply_text = format_message(tagsearcher.search_by_text(text), from);
+        let bot_reply = message.answer(reply_text).parse_mode(ParseMode::HTML);
 
-    if let Some(bot_reply) = bot_reply {
         let replied = if let Some(reply) = message.update.reply_to_message() {
             bot_reply.reply_to_message_id(reply.id)
         } else if should_delete {

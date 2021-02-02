@@ -23,26 +23,21 @@ pub fn format_message(
     links: impl IntoIterator<Item = (Entry, Flavor)>,
     user: Option<&User>,
 ) -> String {
-    links
+    let mut text = links
         .into_iter()
-        .enumerate()
-        .map(|(index, (entry, flavor))| {
-            let prefix = match index {
-                0 => match user {
-                    Some(user) => format!("{} found help", html::user_mention_or_link(user)),
-                    None => "Found help".to_string(),
-                },
-                _ => "... and".to_string(),
-            };
+        .map(|(entry, flavor)| {
             format!(
-                "{} for {} in {} docs:\n{}",
-                prefix,
-                html::code_inline(&entry.topic),
+                "{} docs for {}:\n{}",
                 flavor,
+                html::code_inline(&entry.topic),
                 flavor.format_url(&entry),
             )
         })
-        .join("\n\n")
+        .join("\n\n");
+    if let Some(user) = user {
+        text += format!("\n\n[summoned by {}]", html::user_mention_or_link(user)).as_str();
+    }
+    text
 }
 
 pub fn format_inline_answer(entry: Entry, flavor: Flavor) -> String {

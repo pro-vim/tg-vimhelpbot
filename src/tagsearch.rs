@@ -21,7 +21,7 @@ pub enum Flavor {
 }
 
 impl fmt::Display for Flavor {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let tag = match self {
             Flavor::Vim => "Vim",
             Flavor::NeoVim => "NeoVim",
@@ -95,7 +95,7 @@ impl TagSearcher {
             .filter_map(identity)
     }
 
-    pub fn find_entries_by_text<'a>(
+    pub fn search_by_text<'a>(
         &'a self,
         text: &'a str,
     ) -> impl Iterator<Item = (Entry, Flavor)> + 'a {
