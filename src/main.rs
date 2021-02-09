@@ -25,7 +25,11 @@ async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher
     };
 
     if let Some(text) = text {
-        let reply_text = format_message(tagsearcher.search_by_text(text), from);
+        let search_results: Vec<_> = tagsearcher.search_by_text(text).collect();
+        if search_results.is_empty() {
+            return;
+        }
+        let reply_text = format_message(search_results, from);
         let bot_reply = message.answer(reply_text).parse_mode(ParseMode::HTML);
 
         let replied = if let Some(reply) = message.update.reply_to_message() {
