@@ -10,7 +10,7 @@ use teloxide::{
         InputMessageContentText, ParseMode,
     },
 };
-use utils::{format_inline_answer, format_message, DELETE_REGEX};
+use utils::{format_inline_answer, format_message, DELETE_REGEX, THANKS_REGEX};
 
 async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher) {
     let text = message.update.text();
@@ -45,6 +45,12 @@ async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher
 
         if replied && should_delete {
             message.delete_message().send().await.ok();
+        }
+
+        if !replied && THANKS_REGEX.is_match(text) {
+            if let Err(err) = message.answer_str("You're welcome").await {
+                log::warn!("failed to send message: {}", err);
+            }
         }
     }
 }
