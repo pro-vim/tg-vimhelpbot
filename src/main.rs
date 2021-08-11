@@ -48,8 +48,21 @@ async fn handle_message(message: UpdateWithCx<Message>, tagsearcher: TagSearcher
         }
 
         if !replied && THANKS_REGEX.is_match(text) {
-            if let Err(err) = message.answer_str("You're welcome").await {
-                log::warn!("failed to send message: {}", err);
+            if let Some(replied_to) = message.update.reply_to_message() {
+                if let Some(user) = replied_to.from() {
+                    match message.bot.get_me().send().await {
+                        Ok(me) => {
+                            if me.user.id == user.id {
+                                if let Err(err) = message.answer_str("You're welcome :)").await {
+                                    log::warn!("failed to send message: {}", err);
+                                }
+                            }
+                        }
+                        Err(err) => {
+                            log::warn!("failed to get myself: {}", err);
+                        }
+                    }
+                }
             }
         }
     }

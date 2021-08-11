@@ -20,7 +20,7 @@ pub static DELETE_REGEX: Lazy<Regex> = Lazy::new(|| {
 });
 
 pub static THANKS_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new("спасиб|благодар|thank")
+    Regex::new("(?i)спасиб|благодар|thank")
         .expect("failed to compile regex")
 });
 
