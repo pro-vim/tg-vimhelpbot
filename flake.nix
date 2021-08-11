@@ -18,6 +18,8 @@
       {
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
+            openssl
+            pkg-config
             rust-analyzer
             (rust-bin.stable.latest.minimal.override {
               extensions = [

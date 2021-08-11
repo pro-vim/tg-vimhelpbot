@@ -19,10 +19,8 @@ pub static DELETE_REGEX: Lazy<Regex> = Lazy::new(|| {
         .expect("failed to compile regex")
 });
 
-pub static THANKS_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new("(?i)спасиб|благодар|thank")
-        .expect("failed to compile regex")
-});
+pub static THANKS_REGEX: Lazy<Regex> =
+    Lazy::new(|| Regex::new("(?i)спасиб|благодар|thank").expect("failed to compile regex"));
 
 pub fn format_message(
     links: impl IntoIterator<Item = (Entry, Flavor)>,
