@@ -1,9 +1,9 @@
 name: Update flake inputs
 
 on:
-  - workflow_dispatch
-  - schedule:
-      cron: '0 0 * * 3'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 3'
 
 jobs:
   update-inputs:
