@@ -20,6 +20,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4.2.3
         with:
           commit-message: '[ci] update flake inputs'
+          author: 'GitHub <noreply@github.com>'
           branch: 'ci/update-inputs'
           title: '[ci] update flake inputs'
           body: 'Automated flake inputs update'
