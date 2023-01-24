@@ -127,12 +127,12 @@
               type = types.str;
               default = "/etc/tg-vimhelpbot.env";
             };
-            config = mkIf cfg.enable {
-              systemd.services.tg-vimhelpbot = {
-                script = start-script;
-                wantedBy = [ "multi-user.target" ];
-                serviceConfig.EnvironmentFile = cfg.envFile;
-              };
+          };
+          config = mkIf cfg.enable {
+            systemd.services.tg-vimhelpbot = {
+              script = start-script;
+              wantedBy = [ "multi-user.target" ];
+              serviceConfig.EnvironmentFile = cfg.envFile;
             };
           };
         };
