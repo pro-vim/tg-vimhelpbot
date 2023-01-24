@@ -10,6 +10,27 @@ Use `:h topic` or `:help topic` anywhere in message and bot will send help for `
 
 If message consists only of one or several help requests, bot will try to delete this message after replying.
 
+### I use Nix btw
+
+You can just do
+
+```shell
+$ TELOXIDE_TOKEN=... nix run github:pro-vim/tg-vimhelpbot
+```
+
+then, tag files are packaged with a flake.
+
+If you want to actually deploy it, NixOS module is also provided:
+
+```nix
+{
+  services.tg-vimhelpbot = {
+    enable = true;
+    # should contain something like `TELOXIDE_TOKEN='...'`
+    envFile = "/path/to/file/with/token.env";
+  };
+}
+```
 
 ## License
 This code is available under either MIT or Apache 2.0 license, at your choice.
