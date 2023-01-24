@@ -22,6 +22,9 @@ pub static DELETE_REGEX: Lazy<Regex> = Lazy::new(|| {
 pub static THANKS_REGEX: Lazy<Regex> =
     Lazy::new(|| Regex::new("(?i)спасиб|благодар|thank").expect("failed to compile regex"));
 
+pub static NEOVIM_REGEX: Lazy<Regex> =
+    Lazy::new(|| Regex::new("(?i)n(?:eo)?vim").expect("failed to compile regex"));
+
 pub fn format_message(
     links: impl IntoIterator<Item = (Entry, Flavor)>,
     user: Option<&User>,
@@ -43,11 +46,11 @@ pub fn format_message(
     text
 }
 
-pub fn format_inline_answer(entry: Entry, flavor: Flavor) -> String {
+pub fn format_inline_answer(entry: &Entry, flavor: Flavor) -> String {
     format!(
         "{} docs for {}:\n{}",
         flavor,
         html::code_inline(&entry.topic),
-        flavor.format_url(&entry)
+        flavor.format_url(entry)
     )
 }

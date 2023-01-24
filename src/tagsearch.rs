@@ -1,19 +1,18 @@
 use crate::{
     tagsdb::Entry,
     tagsdb::{TagsDb, Txt},
-    utils::*,
+    utils::HELP_REGEX,
 };
 use percent_encoding::{percent_encode, NON_ALPHANUMERIC};
-use std::{fmt, sync::Arc};
+use std::fmt;
 
-#[derive(Clone)]
 pub struct TagSearcher {
-    vim_db: Arc<TagsDb>,
-    neovim_db: Arc<TagsDb>,
-    custom_db: Option<Arc<TagsDb>>,
+    vim_db: TagsDb,
+    neovim_db: TagsDb,
+    custom_db: Option<TagsDb>,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Flavor {
     Vim,
     NeoVim,
@@ -65,13 +64,9 @@ impl Flavor {
 
 impl TagSearcher {
     pub fn from_env() -> Result<Self, Flavor> {
-        let vim_db = TagsDb::from_env("VIM_DB_PATH", Txt::Trim)
-            .map(Arc::new)
-            .ok_or(Flavor::Vim)?;
-        let neovim_db = TagsDb::from_env("NEOVIM_DB_PATH", Txt::Trim)
-            .map(Arc::new)
-            .ok_or(Flavor::NeoVim)?;
-        let custom_db = TagsDb::from_env("CUSTOM_DB_PATH", Txt::Keep).map(Arc::new);
+        let vim_db = TagsDb::from_env("VIM_DB_PATH", Txt::Trim).ok_or(Flavor::Vim)?;
+        let neovim_db = TagsDb::from_env("NEOVIM_DB_PATH", Txt::Trim).ok_or(Flavor::NeoVim)?;
+        let custom_db = TagsDb::from_env("CUSTOM_DB_PATH", Txt::Keep);
 
         Ok(Self {
             vim_db,
@@ -81,26 +76,28 @@ impl TagSearcher {
     }
 
     pub fn search_by_topic(&self, topic: &str) -> impl Iterator<Item = (Entry, Flavor)> {
-        use std::{convert::identity, iter::once};
-
-        once(self.vim_db.find(topic).map(|entry| (entry, Flavor::Vim)))
-            .chain(once(
-                self.neovim_db
-                    .find(topic)
-                    .map(|entry| (entry, Flavor::NeoVim)),
-            ))
-            .chain(once(self.custom_db.as_ref().and_then(|db| {
-                db.find(topic).map(|entry| (entry, Flavor::Custom))
-            })))
-            .filter_map(identity)
+        std::iter::once(self.vim_db.find(topic).map(|entry| (entry, Flavor::Vim)))
+            .chain([self
+                .neovim_db
+                .find(topic)
+                .map(|entry| (entry, Flavor::NeoVim))])
+            .chain([self
+                .custom_db
+                .as_ref()
+                .and_then(|db| db.find(topic).map(|entry| (entry, Flavor::Custom)))])
+            .flatten()
     }
 
     pub fn search_by_text<'a>(
         &'a self,
         text: &'a str,
+        preferred_flavor: Flavor,
     ) -> impl Iterator<Item = (Entry, Flavor)> + 'a {
-        HELP_REGEX
-            .captures_iter(text)
-            .filter_map(move |cap| self.search_by_topic(&cap[1]).next())
+        HELP_REGEX.captures_iter(text).filter_map(move |captures| {
+            let topic = &captures[1];
+            // false < true
+            self.search_by_topic(topic)
+                .min_by_key(|(_entry, flavor)| flavor != &preferred_flavor)
+        })
     }
 }
