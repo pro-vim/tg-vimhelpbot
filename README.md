@@ -18,9 +18,9 @@ You can just do
 $ TELOXIDE_TOKEN=... nix run github:pro-vim/tg-vimhelpbot
 ```
 
-then, tag files are packaged with a flake.
+then, tag files are packaged with the flake.
 
-If you want to actually deploy it, NixOS module is also provided:
+If you want to actually deploy it, a NixOS module is also provided:
 
 ```nix
 {
