@@ -57,7 +57,7 @@ impl TagsDb {
             let line = line?;
             let parts: Vec<_> = line.split('\t').take(2).collect();
             if parts.len() != 2 {
-                log::warn!("Too few entries in tags line `{}`", line);
+                tracing::warn!("Too few entries in tags line `{}`", line);
                 continue;
             }
             let topic = parts[0];
@@ -95,8 +95,11 @@ impl TagsDb {
     }
 
     pub fn from_env(env_var: &str, trim_txt: Txt) -> Option<Self> {
-        env::var(env_var)
-            .ok()
-            .and_then(|path| Self::read_file(path, trim_txt).ok())
+        let path = env::var(env_var).ok()?;
+        let res = Self::read_file(&path, trim_txt).ok()?;
+
+        tracing::info!("Loaded tags from {path} ({env_var})");
+
+        Some(res)
     }
 }
