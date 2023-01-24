@@ -50,10 +50,15 @@ impl Flavor {
                 )
             }
             Flavor::NeoVim => {
+                let filename = if entry.filename == "index" {
+                    "vimindex"
+                } else {
+                    &entry.filename
+                };
                 format!(
                     "{}/{}.html#{}",
                     self.url_base(),
-                    entry.filename,
+                    filename,
                     percent_encode(entry.topic.as_bytes(), NON_ALPHANUMERIC)
                 )
             }
