@@ -86,7 +86,7 @@
       tags-env-commands = pkgs.lib.concatStringsSep "\n" (pkgs.lib.mapAttrsToList
         (key: value:
           ''
-            if [ -z "$${${key}:-}" ]; then
+            if [ -z "''${${key}:-}" ]; then
               export ${key}=${pkgs.lib.escapeShellArg value}
             fi
           ''
