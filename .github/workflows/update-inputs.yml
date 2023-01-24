@@ -1,0 +1,26 @@
+name: Update flake inputs
+
+on:
+  - workflow_dispatch
+  - schedule:
+      cron: '0 0 * * 3'
+
+jobs:
+  update-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Install Nix
+        uses: cachix/install-nix-action@v15
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - name: Update inputs
+        run: nix flake update
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v4.2.3
+        with:
+          commit-message: '[ci] update flake inputs'
+          branch: 'ci/update-inputs'
+          title: '[ci] update flake inputs'
+          body: 'Automated flake inputs update'
+          add-paths: flake.lock
