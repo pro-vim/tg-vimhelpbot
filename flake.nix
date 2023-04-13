@@ -1,7 +1,6 @@
 {
   inputs = {
-    # Pinned until something is done with https://github.com/neovim/neovim/pull/21711
-    nixpkgs.url = "github:NixOS/nixpkgs/04f574a1c0fde90b51bf68198e2297ca4e7cccf4";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
 
     # Bulding Rust
@@ -9,12 +8,9 @@
       url = "github:ipetkov/crane";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-utils.follows = "flake-utils";
-      };
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     advisory-db = {
       url = "github:rustsec/advisory-db";
@@ -38,19 +34,16 @@
     , vim
     , neovim
     , crane
-    , rust-overlay
+    , fenix
     , advisory-db
     }:
     flake-utils.lib.eachDefaultSystem (system:
     let
       pname = "tg-vimhelpbot";
 
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ (import rust-overlay) ];
-      };
+      pkgs = import nixpkgs { inherit system; };
 
-      rust = pkgs.rust-bin.stable.latest.default;
+      rust = fenix.packages."${system}".stable.toolchain;
       crane-lib = (crane.mkLib pkgs).overrideToolchain rust;
       src = crane-lib.cleanCargoSource ./.;
       cargoArtifacts = crane-lib.buildDepsOnly { inherit src; };
