@@ -141,7 +141,7 @@ async fn handle_inline_query(
 async fn main() -> eyre::Result<()> {
     color_eyre::install()?;
     tracing_subscriber::fmt().init();
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
 
     let bot = Bot::from_env();
     tracing::info!("Starting vim-help bot...");
