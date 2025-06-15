@@ -1,5 +1,6 @@
+use std::sync::LazyLock;
+
 use itertools::Itertools;
-use once_cell::sync::Lazy;
 use regex::Regex;
 use teloxide::{types::User, utils::html};
 
@@ -11,19 +12,19 @@ macro_rules! help_regex_s {
     };
 }
 
-pub static HELP_REGEX: Lazy<Regex> =
-    Lazy::new(|| Regex::new(help_regex_s!()).expect("failed to compile regex"));
+pub static HELP_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(help_regex_s!()).expect("failed to compile regex"));
 
-pub static DELETE_REGEX: Lazy<Regex> = Lazy::new(|| {
+pub static DELETE_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(concat!(r"^[\s\n]*(?:", help_regex_s!(), r"[\s\n]*)+$"))
         .expect("failed to compile regex")
 });
 
-pub static THANKS_REGEX: Lazy<Regex> =
-    Lazy::new(|| Regex::new("(?i)спасиб|благодар|thank").expect("failed to compile regex"));
+pub static THANKS_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("(?i)спасиб|благодар|thank").expect("failed to compile regex"));
 
-pub static NEOVIM_REGEX: Lazy<Regex> =
-    Lazy::new(|| Regex::new("(?i)n(?:eo)?vim").expect("failed to compile regex"));
+pub static NEOVIM_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new("(?i)n(?:eo)?vim").expect("failed to compile regex"));
 
 pub fn format_message(
     links: impl IntoIterator<Item = (Entry, Flavor)>,

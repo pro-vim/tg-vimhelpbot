@@ -1306,7 +1306,6 @@ dependencies = [
  "color-eyre",
  "dotenvy",
  "itertools",
- "once_cell",
  "percent-encoding",
  "regex",
  "teloxide",
