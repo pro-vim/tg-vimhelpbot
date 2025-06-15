@@ -4,10 +4,7 @@
     flake-utils.url = "github:numtide/flake-utils";
 
     # Bulding Rust
-    crane = {
-      url = "github:ipetkov/crane";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    crane.url = "github:ipetkov/crane";
     fenix = {
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,10 +15,6 @@
     };
 
     # Tags sources
-    neovim = {
-      url = "github:neovim/neovim?dir=contrib";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     vim = {
       url = "github:vim/vim";
       flake = false;
@@ -32,7 +25,6 @@
     , nixpkgs
     , flake-utils
     , vim
-    , neovim
     , crane
     , fenix
     , advisory-db
@@ -60,7 +52,7 @@
         PATH = "${pkgs.coreutils}/bin";
       };
 
-      neovim-pkg = neovim.packages.${system}.neovim;
+      neovim-pkg = pkgs.neovim;
       neovim-helptags = derivation {
         name = "neovim-helptags";
         inherit system;
