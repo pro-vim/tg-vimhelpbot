@@ -46,7 +46,7 @@ fn add_entry(
 fn best_match(opts: &[Entry]) -> Option<Entry> {
     let mut opts: Vec<_> = opts.to_owned();
     opts.sort_unstable_by_key(|e| e.weight);
-    opts.get(0).map(Entry::clone)
+    opts.first().cloned()
 }
 
 impl TagsDb {
@@ -75,6 +75,7 @@ impl TagsDb {
         Ok(Self { entries })
     }
 
+    #[expect(clippy::manual_unwrap_or_default, reason = "just looks better this way")]
     pub fn find(&self, topic: &str) -> Option<Entry> {
         let topic_lc = topic.to_lowercase();
         if let Some(result) = self.entries.get(topic).map(|xs| best_match(xs)) {

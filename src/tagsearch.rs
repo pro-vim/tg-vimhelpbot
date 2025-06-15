@@ -6,6 +6,7 @@ use crate::{
 use percent_encoding::{percent_encode, NON_ALPHANUMERIC};
 use std::fmt;
 
+#[expect(clippy::struct_field_names, reason = "no, wtf is this lint")]
 pub struct TagSearcher {
     vim_db: TagsDb,
     neovim_db: TagsDb,
